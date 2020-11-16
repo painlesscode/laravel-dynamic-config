@@ -34,8 +34,6 @@ return [
 > * You can enable cache for faster access. To enable cache dynamic configuration. just edit `enable_cache` key of `dynamic_config.php` file to `true`.
 > * Cache file will be stored at `bootstrap/cache/dynamic_config.php` file. You can change the cache file name by editing `cache_file_name` key of of `dynamic_config.php` file. 
 
-## Usage
-
 
 #### Getting Dynamic Config Value
 
