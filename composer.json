@@ -1,0 +1,44 @@
+{
+    "name": "painlesscode/laravel-dynamic-config",
+    "description": "A laravel package to control configuration dynamically",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Hazzaz Bin Faiz",
+            "email": "hazzazbinfaiz@gmail.com"
+        }
+    ],
+    "require": {
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Painless\\DynamicConfig\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Painless\\DynamicConfig\\Tests\\": "tests/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Painless\\DynamicConfig\\DynamicConfigServiceProvider"
+            ],
+            "aliases": {
+                "DynamicConfig": "Painless\\DynamicConfig\\Facades\\DynamicConfig"
+            }
+        }
+    },
+    "scripts": {
+        "test" : "./vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover"
+    },
+    "minimum-stability": "dev"
+}
