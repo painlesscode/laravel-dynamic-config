@@ -1,5 +1,6 @@
 # Laravel Dynamic Config
 
+![PHP Composer test](https://github.com/painlesscode/laravel-dynamic-config/workflows/PHP%20Composer/badge.svg)
 
 ## Introduction
 This Package allow users to have their configuration stored in database, makes it easy to customize.
