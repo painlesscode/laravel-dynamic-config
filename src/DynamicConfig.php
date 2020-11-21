@@ -104,11 +104,14 @@ class DynamicConfig
     }
 
     protected function getFreshConfiguration(){
-//        $app = require app()->bootstrapPath().'/app.php';
-//        $app->useStoragePath(app()->storagePath());
-//        $app->make(ConsoleKernelContract::class)->bootstrap();
-//        return $app['config']->all();
-        return $this->config->all();
+        try {
+            $app = require app()->bootstrapPath().'/app.php';
+            $app->useStoragePath(app()->storagePath());
+            $app->make(ConsoleKernelContract::class)->bootstrap();
+            return $app['config']->all();
+        } catch (ErrorException $ex){
+            return $this->config->all();
+        }
     }
 
     protected function prefixConfigKeys($array, $prefix = null)
