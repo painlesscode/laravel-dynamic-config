@@ -2,9 +2,12 @@
 
 namespace Painless\DynamicConfig;
 
+use ErrorException;
 use Illuminate\Config\Repository;
+use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
+use LogicException;
 use Throwable;
 
 class DynamicConfig
@@ -18,24 +21,34 @@ class DynamicConfig
         $this->files = $files;
     }
 
-    public function revert($key)
+    public function get($key, $default = null)
     {
-        $default_key = $this->get('dynamic_config.default_prefix');
-        $this->set($key, $this->config->get($default_key.'.'.$key));
+        return $this->config->get($key, $default);
     }
 
     public function set($key, $value = null)
     {
         $this->config->set($key, $value);
-        $this->addToDatabase($key, $value);
-        if ($this->config->get('dynamic_config.enable_cache')) {
-            $this->writeToCache();
+        if(explode('.', $key)[0] !== 'dynamic_config'){
+            $this->addToDatabase($key, $value);
+            if ($this->config->get('dynamic_config.enable_cache')) {
+                $this->writeToCache();
+            }
+            if($this->config->get('dynamic_config.load_at_startup')){
+                $this->writeToStartUpCacheFile($this->config->all());
+            }
         }
     }
 
-    public function get($key, $default = null)
+    public function revert($key, $persist = true)
     {
-        return $this->config->get($key, $default);
+        $default_key = $this->get('dynamic_config.default_prefix');
+        if($persist) {
+            $this->set($key, $this->config->get($default_key.'.'.$key));
+        }
+        else {
+            $this->config->set($key, $this->config->get($default_key.'.'.$key));
+        }
     }
 
     public function update()
@@ -44,7 +57,7 @@ class DynamicConfig
         $default_prefix = $this->config->get('dynamic_config.default_prefix');
 
         $original_config_keys = $this->prefixConfigKeys(
-            array_filter($original_configs = $this->config->get($default_prefix), function ($key) use ($dynamic_configs) {
+            array_filter($original_configs = $this->config->get($default_prefix) ?? [], function ($key) use ($dynamic_configs) {
                 return in_array($key, $dynamic_configs);
             }, ARRAY_FILTER_USE_KEY)
         );
@@ -55,16 +68,17 @@ class DynamicConfig
             }, ARRAY_FILTER_USE_KEY)
         );
 
-        $dirty = false;
+        DynamicConfigModel::whereNotIn('key', $dynamic_configs)->delete();
+
 
         if ($this->config->get('dynamic_config.delete_absence_config')) {
             $absence_keys = array_diff($dynamic_config_keys, $original_config_keys);
             Arr::forget($all_configs, $absence_keys);
             if (count($absence_keys) > 0) {
                 foreach ($absence_keys as $absence_key) {
+                    $this->config->offsetUnset($absence_key);
                     $this->removeFromDatabase($absence_key);
                 }
-                $dirty = true;
             }
         }
 
@@ -78,12 +92,45 @@ class DynamicConfig
                 $new_key,
                 Arr::get($original_configs, $new_key)
             );
-            $dirty = true;
         }
 
-        if ($dirty) {
+        $this->writeToCacheFile($all_configs);
+        if ($this->config->get('dynamic_config.enable_cache')) {
             $this->writeToCacheFile($all_configs);
         }
+        if($this->config->get('dynamic_config.load_at_startup')){
+            $this->writeToStartUpCacheFile($this->getFreshConfiguration());
+        }
+    }
+
+    protected function getFreshConfiguration(){
+        try {
+            $app = require app()->bootstrapPath().'/app.php';
+        } catch (ErrorException $ex){
+            $app = $this->getFreshApp();
+        }
+        $app->useStoragePath(app()->storagePath());
+        $app->make(ConsoleKernelContract::class)->bootstrap();
+        return $app['config']->all();
+    }
+
+    protected function getFreshApp(){
+        $app = new \Illuminate\Foundation\Application(
+             base_path()
+        );
+        $app->singleton(
+            \Illuminate\Contracts\Http\Kernel::class,
+            \App\Http\Kernel::class
+        );
+        $app->singleton(
+            \Illuminate\Contracts\Console\Kernel::class,
+            \App\Console\Kernel::class
+        );
+        $app->singleton(
+            \Illuminate\Contracts\Debug\ExceptionHandler::class,
+            \App\Exceptions\Handler::class
+        );
+        return $app;
     }
 
     protected function prefixConfigKeys($array, $prefix = null)
@@ -155,23 +202,30 @@ class DynamicConfig
         $this->writeToCacheFile($configs);
     }
 
-    protected function writeToCacheFile($configs)
+    public function writeToCacheFile($configs, $file_name = null)
     {
-        $cache_file = $this->getCacheFilePath();
+        $cache_file = $file_name ?? $this->getCacheFilePath();
         $this->files->put(
             $cache_file,
             '<?php return '.var_export($configs, true).';'.PHP_EOL
         );
         try {
             require $cache_file;
+            return true;
         } catch (Throwable $e) {
-            unlink($cache_file);
+            $this->files->delete($cache_file);
+            throw new LogicException('Your configuration files are not serializable.', 0, $e);
         }
+    }
+
+    protected function writeToStartUpCacheFile($configs){
+        $configs['dynamic_config']['loaded_from_cache'] = true;
+        return $this->writeToCacheFile($configs, app()->getCachedConfigPath());
     }
 
     public function getDynamicConfigFileNames()
     {
-        return array_filter($this->config->get('dynamic_config.dynamic_configs'), function ($item) {
+        return array_filter($this->config->get('dynamic_config.dynamic_configs') ?? [], static function ($item) {
             return $item !== 'dynamic_config';
         });
     }

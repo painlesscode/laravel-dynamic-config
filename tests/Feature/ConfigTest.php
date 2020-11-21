@@ -2,6 +2,7 @@
 
 namespace Painless\DynamicConfig\Tests\Feature;
 
+use Painless\DynamicConfig\DynamicConfigModel;
 use Painless\DynamicConfig\Tests\TestCase;
 
 class ConfigTest extends TestCase

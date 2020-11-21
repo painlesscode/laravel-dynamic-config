@@ -60,4 +60,5 @@ return [
     */
 
     'cache_file_name' => 'dynamic_config',
+    'load_at_startup' => false,
 ];
