@@ -104,33 +104,11 @@ class DynamicConfig
     }
 
     protected function getFreshConfiguration(){
-        try {
-            $app = require app()->bootstrapPath().'/app.php';
-        } catch (ErrorException $ex){
-            $app = $this->getFreshApp();
-        }
-        $app->useStoragePath(app()->storagePath());
-        $app->make(ConsoleKernelContract::class)->bootstrap();
-        return $app['config']->all();
-    }
-
-    protected function getFreshApp(){
-        $app = new \Illuminate\Foundation\Application(
-             base_path()
-        );
-        $app->singleton(
-            \Illuminate\Contracts\Http\Kernel::class,
-            \App\Http\Kernel::class
-        );
-        $app->singleton(
-            \Illuminate\Contracts\Console\Kernel::class,
-            \App\Console\Kernel::class
-        );
-        $app->singleton(
-            \Illuminate\Contracts\Debug\ExceptionHandler::class,
-            \App\Exceptions\Handler::class
-        );
-        return $app;
+//        $app = require app()->bootstrapPath().'/app.php';
+//        $app->useStoragePath(app()->storagePath());
+//        $app->make(ConsoleKernelContract::class)->bootstrap();
+//        return $app['config']->all();
+        return $this->config->all();
     }
 
     protected function prefixConfigKeys($array, $prefix = null)
