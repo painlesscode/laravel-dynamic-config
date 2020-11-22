@@ -39,29 +39,38 @@ return [
 #### Getting Dynamic Config Value
 
 ```php
-echo config('mail.default'); // Will return the value of dynamic mail.default (if mail is already added to dynamic_configs array);
+echo config('mail.default'); 
+// Will return the value of dynamic mail.default (if mail is already added to dynamic_configs array);
 ```
 
 #### Getting Original Config Value
 
 ```php
-echo config('defailt.mail.default'); // Will return the value of original configuration (if default_prefix is set to 'default');
+echo config('defailt.mail.default'); 
+// Will return the value of original configuration (if default_prefix is set to 'default');
 ```
 
 #### Setting Dynamic Config Value
 
 ```php
-config('mail.default', 'array'); // It is like default laravel config set. it will be set but persists in only current request.
-// to set value permanently
-use Painless\DynamicConfig\Facades\DynamicConfig; // or you can use DynamicConfig Alias
+config('mail.default', 'array'); 
+// It is like default laravel config set. it will be set but persists in only current request.
 
-DynamicConfig::set('mail.default', 'ses'); // It will save the value and persist it in database and cache (if enabled)
+// to set value permanently
+use Painless\DynamicConfig\Facades\DynamicConfig; 
+
+// or you can use DynamicConfig Alias
+
+DynamicConfig::set('mail.default', 'ses'); 
+// It will save the value and persist it in database and cache (if enabled)
 ```
 
 #### Revert config value
 to revert a config value to its original state:
 ```php
-use Painless\DynamicConfig\Facades\DynamicConfig; // or you can use DynamicConfig Alias
+use Painless\DynamicConfig\Facades\DynamicConfig; 
+// or you can use DynamicConfig Alias
 
-DynamicConfig::revert('mail.default', 'ses'); // It will revert the config value to its original state and persist it. 
+DynamicConfig::revert('mail.default', 'ses'); 
+// It will revert the config value to its original state and persist it. 
 ```
