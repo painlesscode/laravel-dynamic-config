@@ -60,5 +60,22 @@ return [
     */
 
     'cache_file_name' => 'dynamic_config',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dynamic configuration should load at startup or not
+    |--------------------------------------------------------------------------
+    |
+    | If you enable this feature.
+    | Dynamic configurations will load at startup.
+    | As usual dynamic config loads at application boot time.
+    | So, if you want to control core configurations like timezone, view path etc.
+    | you have to this.
+    |
+    |  WARNING : If you enable this feature. Configuration will always remain cache by default.
+    |   After enabling this, if you change anything in your configuration file which is being controlled
+    |   dynamically, you have to run config:cache every time to update cache.
+    |
+    */
     'load_at_startup' => false,
 ];
