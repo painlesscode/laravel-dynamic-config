@@ -29,6 +29,8 @@ class UpdateConfigCommand extends Command
      */
     public function handle()
     {
+        $this->call('config:clear');
+
         $this->laravel['dynamic_config']->update();
 
         $this->info('Configuration updated!');
