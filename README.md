@@ -1,6 +1,8 @@
 # Laravel Dynamic Config
 
-![PHP Composer test](https://github.com/painlesscode/laravel-dynamic-config/workflows/PHP%20Composer/badge.svg)
+[![PHP Composer test](https://github.com/painlesscode/laravel-dynamic-config/workflows/PHP%20Composer/badge.svg)](https://github.com/painlesscode/laravel-dynamic-config/actions?query=workflow%3A%22PHP+Composer%22)
+[![License](https://img.shields.io/github/license/painlesscode/laravel-dynamic-config)](https://github.com/painlesscode/laravel-dynamic-config/blob/master/license.md)
+
 
 ## Introduction
 This Package allow users to have their configuration stored in database, makes it easy to customize.
