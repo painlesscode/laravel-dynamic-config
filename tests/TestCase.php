@@ -29,9 +29,6 @@ class TestCase extends \Orchestra\Testbench\TestCase
                 $this->app['dynamic_config']->getCacheFilePath()
             );
             $this->app['files']->delete(
-                $this->app['dynamic_config']->getCacheFilePath()
-            );
-            $this->app['files']->delete(
                 $this->app->getCachedConfigPath()
             );
             $this->app['files']->delete(

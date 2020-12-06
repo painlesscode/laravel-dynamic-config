@@ -16,6 +16,14 @@ class ConfigStartupTest extends TestCase
         parent::resolveApplicationConfiguration($app);
     }
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->app['files']->delete(
+            $this->app->bootstrapPath().'/app.php'
+        );
+    }
+
     public function testLoadAtStatupTest(){
         $this->app['config']['dynamic_config.load_at_startup'] = true;
         $this->app['dynamic_config']->update();
