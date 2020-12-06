@@ -16,7 +16,7 @@ class ConfigStartupTest extends TestCase
         parent::resolveApplicationConfiguration($app);
     }
 
-    public function testExceptionTest(){
+    public function testLoadAtStatupTest(){
         $this->app['config']['dynamic_config.load_at_startup'] = true;
         $this->app['dynamic_config']->update();
         $cache_file_content = $this->app['files']->get(
